@@ -54,7 +54,7 @@ int main()
     assert(fileLab1.is_open() && "fileLab1 isn't open");
 
     //  // Euler method
-    auto eulerMethodVar3 = std::bind(SundayWork::eulerMethod,
+    auto eulerMethod_Var3 = std::bind(SundayWork::eulerMethod,
                                      std::ref(fileLab1),
                                      SundayWork::Var3::startX,
                                      SundayWork::Var3::startY,
@@ -62,17 +62,21 @@ int main()
                                      _1,    // step
                                      SundayWork::Var3::func);
     // step = 0.01 && 0.001
-    solveEulerMethod("Euler method step=", fileLab1, eulerMethodVar3);
-
-    /*SundayWork::eulerMethod(fileLab1, 1, 1, 0.01, [](double _x, double _y) -> long double {
-        return (1-_x*_x)/(_x*_y);
-    });*/
+    solveEulerMethod("Euler method step=", fileLab1, eulerMethod_Var3);
 
     //  // Modified Euler method
-    // step = 0.01
-    //fileLab1.open(filenameLab1, fstream::out);
-    // step = 0.001
-    //fileLab1.open(filenameLab1, fstream::out);
+    auto modifiedEulerMethod_Var3 = std::bind(SundayWork::modifiedEulerMethod,
+                                     std::ref(fileLab1),
+                                     SundayWork::Var3::startX,
+                                     SundayWork::Var3::startY,
+                                     SundayWork::Var3::endX,
+                                     _1,    // step
+                                     SundayWork::Var3::func);
+    // step = 0.01 && 0.001
+    solveEulerMethod("Euler method step=", fileLab1, modifiedEulerMethod_Var3);
+
+    SundayWork::modifiedEulerMethod(fileLab1, 1, 1, 2.2, 0.12,
+                                    SundayWork::Var3::func);
 
     cout << endl;
     return 0;
