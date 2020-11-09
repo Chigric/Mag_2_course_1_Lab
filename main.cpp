@@ -8,28 +8,35 @@
 
 using namespace std;
 using namespace std::placeholders;
-//using namespace SundayWork;
+
+namespace SundayWork {
+namespace Var3 {
+
+double startX = 1;
+double startY = 1;
+double endX = 2;
+auto func = [](double _x, double _y) -> long double {
+    //assert(_y == 0 && "arg y is division by 0");
+    if (_y == 0.L) throw std::invalid_argument("arg y is division by 0");
+    return (1-_x*_x)/(_x*_y);
+};
+
+}
+}
 
 const string filenameLab1 = "output1.out";
 
 
+template<typename Func>
 void solveEulerMethod(const string& annotation, fstream& fileLab1,
-                      double startX, double startY, double endX,
-                      function<long double(double, double)> specFunc,
-                      function<void (std::fstream&,
-                            double, double, double, double,
-                            std::function<long double(double, double)>
-                                     )> mathMethod)
+                      Func& mathMethod)
 {
-    auto func = std::bind(mathMethod, std::ref(fileLab1),
-                          _1, _2, _3, _4, // startX, startY, endX, step
-                          specFunc);
     // step = 0.01 && 0.001
     double steps[] = {0.01L, 0.001L};
     for (auto step : steps) {
         cout << annotation << step << endl;
         fileLab1 << annotation << step << endl;
-        func(startX, startY, endX, step);
+        mathMethod(step);
         // Cool job boy (pretty output && kostil')
         cout        << endl << endl;
         fileLab1    << endl << endl;
@@ -47,12 +54,15 @@ int main()
     assert(fileLab1.is_open() && "fileLab1 isn't open");
 
     //  // Euler method
+    auto eulerMethodVar3 = std::bind(SundayWork::eulerMethod,
+                                     std::ref(fileLab1),
+                                     SundayWork::Var3::startX,
+                                     SundayWork::Var3::startY,
+                                     SundayWork::Var3::endX,
+                                     _1,    // step
+                                     SundayWork::Var3::func);
     // step = 0.01 && 0.001
-    solveEulerMethod("Euler method step=", fileLab1, 1, 1, 2,
-                     [](double _x, double _y) -> long double {
-        return (1-_x*_x)/(_x*_y);
-    },
-    SundayWork::eulerMethod);
+    solveEulerMethod("Euler method step=", fileLab1, eulerMethodVar3);
 
     /*SundayWork::eulerMethod(fileLab1, 1, 1, 0.01, [](double _x, double _y) -> long double {
         return (1-_x*_x)/(_x*_y);
