@@ -6,10 +6,10 @@ using namespace std;
 namespace SundayWork {
 void eulerMethod(fstream& fileLab1,
                  double startX, double startY, double endX, double step,
-                 std::function<long double(double, double)> func) {
+                 std::function<long double(long double, long double)> func) {
     size_t maxSize = ((endX - startX) / step) + 1;
-    std::valarray<double> arrX(maxSize);
-    std::valarray<double> arrY(maxSize);
+    std::valarray<long double> arrX(maxSize);
+    std::valarray<long double> arrY(maxSize);
 
     // init array for X_n
     for (size_t i = 0; i < arrX.size(); i++)
@@ -29,10 +29,10 @@ void eulerMethod(fstream& fileLab1,
 
 void modifiedEulerMethod(fstream& fileLab1,
                          double startX, double startY, double endX, double step,
-                         std::function<long double(double, double)> func) {
+                         std::function<long double(long double, long double)> func) {
     size_t maxSize = ((endX - startX) / step) + 1;
-    std::valarray<double> arrX(maxSize);
-    std::valarray<double> arrY(maxSize);
+    std::valarray<long double> arrX(maxSize);
+    std::valarray<long double> arrY(maxSize);
 
     // init array for X_n
     for (size_t i = 0; i < arrX.size(); i++)
@@ -44,7 +44,7 @@ void modifiedEulerMethod(fstream& fileLab1,
     while (++iterY != end(arrY) && ++iterX) {
         auto prevY = std::prev(iterY);
         auto prevX = std::prev(iterX);
-        double pseudoY = (*prevY) + step * func((*prevX), *prevY);
+        long double pseudoY = (*prevY) + step * func((*prevX), *prevY);
         (*iterY) = (*prevY) + (step/2) *
                 ( func((*prevX), *prevY) + func((*iterX), pseudoY) );
     }

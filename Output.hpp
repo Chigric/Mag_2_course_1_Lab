@@ -26,14 +26,14 @@ void output2File(std::fstream& file, Vector vecX, Vector vecY)
     file << std::endl;   std::cout << std::endl;
     // out array of X_i
     file << "x_i ";   std::cout << "x_i ";
-    for (double& ptr : vecX) {
+    for (auto& ptr : vecX) {
         file << ptr << " ";
         std::cout << ptr << " ";
     }
     file << std::endl;   std::cout << std::endl;
     // out array of Y_i
     file << "y_i ";   std::cout << "y_i ";
-    for (double& ptr : vecY) {
+    for (auto& ptr : vecY) {
         file << ptr << " ";
         std::cout << ptr << " ";
     }
@@ -42,7 +42,7 @@ void output2File(std::fstream& file, Vector vecX, Vector vecY)
 }
 
 template <typename Vector>
-void output2File(std::fstream& file, Vector vecX, std::function<double(double)> func)
+void output2File(std::fstream& file, Vector vecX, std::function<long double(long double)> func)
 {
     // out array of i
     file << "i ";   std::cout << "i ";

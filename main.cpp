@@ -15,7 +15,7 @@ namespace Var3 {
 double startX = 1;
 double startY = 1;
 double endX = 2;
-auto func = [](double _x, double _y) -> long double {
+auto func = [](long double _x, long double _y) -> long double {
     //assert(_y == 0 && "arg y is division by 0");
     if (_y == 0.L) throw std::invalid_argument("arg y is division by 0");
     return (1-_x*_x)/(_x*_y);
@@ -32,7 +32,7 @@ void solveEulerMethod(const string& annotation, fstream& fileLab1,
                       Func& mathMethod)
 {
     // step = 0.01 && 0.001
-    double steps[] = {0.01L, 0.001L};
+    long double steps[] = {0.01L, 0.001L};
     for (auto step : steps) {
         cout << annotation << step << endl;
         fileLab1 << annotation << step << endl;
@@ -72,11 +72,9 @@ int main()
                                      SundayWork::Var3::endX,
                                      _1,    // step
                                      SundayWork::Var3::func);
-    // step = 0.01 && 0.001
-    solveEulerMethod("Euler method step=", fileLab1, modifiedEulerMethod_Var3);
 
-    SundayWork::modifiedEulerMethod(fileLab1, 1, 1, 2.2, 0.12,
-                                    SundayWork::Var3::func);
+    // step = 0.01 && 0.001
+    solveEulerMethod("Modified euler method step=", fileLab1, modifiedEulerMethod_Var3);
 
     cout << endl;
     return 0;
