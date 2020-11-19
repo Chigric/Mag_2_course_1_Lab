@@ -76,6 +76,18 @@ int main()
     // step = 0.01 && 0.001
     solveEulerMethod("Modified euler method step=", fileLab1, modifiedEulerMethod_Var3);
 
+    //  // Runge-Kutta fourth-order method (RK4)
+    auto RK4Method_Var3 = std::bind(SundayWork::RK4Method,
+                                     std::ref(fileLab1),
+                                     SundayWork::Var3::startX,
+                                     SundayWork::Var3::startY,
+                                     SundayWork::Var3::endX,
+                                     _1,    // step
+                                     SundayWork::Var3::func);
+
+    // step = 0.01 && 0.001
+    solveEulerMethod("Runge-Kutta fourth-order method step=", fileLab1, RK4Method_Var3);
+
     cout << endl;
     return 0;
 }
