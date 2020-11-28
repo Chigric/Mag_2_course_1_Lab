@@ -92,5 +92,14 @@ int main(int argc, char** argv)
     solveEulerMethod("Runge-Kutta fourth-order method step=", fileLab1, RK4Method_Var3);
 
     cout << endl;
+
+
+    auto solveFunc = [] (long double x) -> long double {
+        return std::sqrt(-1*(x*x) + 2*std::log(x) + 5);
+    };
+    std::cout.setf(std::ios::fixed);
+    std::cout.precision(16);
+    cout << solveFunc(2) << endl;
+
     return 0;
 }
