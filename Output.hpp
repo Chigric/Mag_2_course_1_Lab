@@ -39,15 +39,22 @@ public:
     template<typename Arg>
     DoubleOutput& operator <<(Arg& data)
     {
+        std::cout.setf(std::ios::fixed);
+        std::cout.precision(6);
         std::cout << data;
+        outFile.setf(std::ios::fixed);
+        outFile.precision(6);
         outFile << data;
         return *this;
     }
-
     template<typename Arg>
     DoubleOutput& operator <<(Arg&& data)
     {
+        std::cout.setf(std::ios::fixed);
+        std::cout.precision(8);
         std::cout << data;
+        outFile.setf(std::ios::fixed);
+        outFile.precision(8);
         outFile << data;
         return *this;
     }
@@ -66,56 +73,55 @@ void output2File(std::fstream& file, Vector vecX, Vector vecY)
 {
     DoubleOutput out(file);
     size_t size = vecX.size();
-    const size_t prettyOutput = 10;
-    auto myLoop = [&out, &prettyOutput] (const char* str, Vector& vec) {
+    // сколько столбцов в строке && текущее полажение каретки
+    size_t prettyOutput = 10, curSize = 0;
+    // шаг вывода && через сколько мы увеличиваем шаг
+    size_t stepOutput = 1;
+    // my Loop =)
+    auto myLoop = [&] (const char* str, Vector& vec) {
         out << str;
-        for (size_t i = 0; i < prettyOutput; i++)
-            out << vec[i] << " ";
+        for (size_t i = curSize; i < curSize+prettyOutput; i+=stepOutput) {
+            if (i == curSize+prettyOutput - 1)
+                out << vec[i];
+            else
+                out << vec[i] << " ";
+        }
     };
 
-    size_t tmpSize = 0;
-    while (tmpSize < size) {
+    Vector iVec(size);
+    int count = 0;
+    for (auto& ptr : iVec)
+        ptr = count++;
+
+    while (curSize < size) {
         // out array of i
-        out << "i ";
-        for (size_t i = 0; i < prettyOutput; i++)
-            out << i << " ";
+        myLoop("i ", iVec);
         out << SundayWork::endl;
         // out array of x_i
-        myLoop("x_i ", vecX);
+        myLoop("X ", vecX);
         out << SundayWork::endl;
         // out array of Y_i
-        myLoop("y_i ", vecY);
+        myLoop("Y ", vecY);
 
-        if ((tmpSize += prettyOutput) < size)
+        curSize += prettyOutput;
+        if (curSize < size)
             out << SundayWork::endl;
+        // output last row
+        if (curSize >= size - prettyOutput)
+            prettyOutput = size - curSize;
     }
 }
 
 template <typename Vector>
 void output2File(std::fstream& file, Vector vecX, std::function<long double(long double)> func)
 {
-    // out array of i
-    file << "i ";   std::cout << "i ";
-    for (size_t i = 0; i < vecX.size(); i++) {
-        file << std::to_string(i) << " ";
-        std::cout << std::to_string(i) << " ";
+    Vector vecY(vecX.size());
+    auto iterY = std::begin(vecY);
+    for (auto ptr : vecX) {
+        *iterY = func(ptr);
+        ++iterY;
     }
-    file << std::endl;   std::cout << std::endl;
-    // out array of X_i
-    file << "x_i ";   std::cout << "x_i ";
-    for (double& ptr : vecX) {
-        file << ptr << " ";
-        std::cout << ptr << " ";
-    }
-    file << std::endl;   std::cout << std::endl;
-    // out array of Y_i
-    file << "y_i ";   std::cout << "y_i ";
-    for (double& ptr : vecX) {
-        file << func(ptr) << " ";
-        std::cout << func(ptr) << " ";
-    }
-
-    file.close();
+    output2File(file, vecX, vecY);
 }
 
 }
