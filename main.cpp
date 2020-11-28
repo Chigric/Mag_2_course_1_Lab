@@ -13,7 +13,7 @@ namespace SundayWork {
 namespace Var3 {
 
 double startX = 1;
-double startY = 1;
+double startY = 2;
 double endX = 2;
 auto func = [](long double _x, long double _y) -> long double {
     //assert(_y == 0 && "arg y is division by 0");
@@ -38,15 +38,18 @@ void solveEulerMethod(const string& annotation, fstream& fileLab1,
         fileLab1 << annotation << step << endl;
         mathMethod(step);
         // Cool job boy (pretty output && kostil')
+        fileLab1.open(filenameLab1, fstream::in | fstream::app);
         cout        << endl << endl;
         fileLab1    << endl << endl;
-        fileLab1.open(filenameLab1, fstream::out);
     }
-    cout        << endl;
-    fileLab1    << endl;
+
+    cout        << "|---------------- END MATH METHOD ----------------|"
+                << endl << endl;
+    fileLab1    << "|---------------- END MATH METHOD ----------------|"
+                << endl << endl;
 }
 
-int main()
+int main(int argc, char** argv)
 {
     cout << endl;
 
