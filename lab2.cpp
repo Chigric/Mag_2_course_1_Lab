@@ -9,7 +9,7 @@ namespace SundayWork {
 
 // Gauss method for square Matrix (or Gaussian elimination)
 //template <typename Vector, typename doubleVector>
-Vector gaussianElimination(const doubleVector& cVecA, const Vector& cVecY)
+Vector gaussianElimination(const DoubleVector& cVecA, const Vector& cVecY)
 //std::valarray<long double>&& gaussianElimination(const std::valarray<std::valarray<long double> >& cVecA, const std::valarray<long double>& cVecY)
 {
     // Matrix isn't square
@@ -17,7 +17,7 @@ Vector gaussianElimination(const doubleVector& cVecA, const Vector& cVecY)
     for (auto ptr : cVecA)
         assert(ptr.size() == cVecA.size() && "Matrix isn't square");
 
-    doubleVector vecA = cVecA;
+    DoubleVector vecA = cVecA;
     Vector vecY = cVecY;
     for (size_t i = 0; i < vecA.size(); i++) {
         // swap rows
@@ -53,5 +53,17 @@ Vector gaussianElimination(const doubleVector& cVecA, const Vector& cVecY)
 
     return vecY;
 }
+
+
+namespace CubatureRules {
+    MaxDouble Trapezoidal(MaxDouble a, MaxDouble b, SpecFunc func)
+    {
+        return (func(a) + func(b)) / 2;
+    }
+
+    MaxDouble Simpson(MaxDouble a, MaxDouble b, SpecFunc func);
+    MaxDouble Simpson_3by8(MaxDouble a, MaxDouble b, SpecFunc func); // Simpson's 3/8
+}
+
 
 }
