@@ -7,25 +7,35 @@
 
 
 namespace SundayWork {
-
+// Some types definition
 using MaxDouble = long double;
 using Vector = std::valarray<MaxDouble>;
 using DoubleVector = std::valarray<std::valarray<MaxDouble> >;
 
 using SpecFunc = std::function<MaxDouble(MaxDouble)>;
+using SpecFunc2Arg = std::function<MaxDouble(MaxDouble, MaxDouble)>;
 
 // Gauss method for square Matrix (or Gaussian elimination)
-//template <typename Vector, typename doubleVector>
-
-
 Vector gaussianElimination(const DoubleVector& cVecA, const Vector& cVecY);
-//std::valarray<long double>&& gaussianElimination(const std::valarray<std::valarray<long double> >& cVecA, const std::valarray<long double>& cVecY);
 
 namespace CubatureRules {
+    // Type of cubature rule
+    using TCubatureRule = std::function<MaxDouble(MaxDouble, MaxDouble, SpecFunc)>;
+
     MaxDouble Trapezoidal(MaxDouble a, MaxDouble b, SpecFunc func);
     MaxDouble Simpson(MaxDouble a, MaxDouble b, SpecFunc func);
     MaxDouble Simpson_3by8(MaxDouble a, MaxDouble b, SpecFunc func); // Simpson's 3/8
 }
+
+// Successive approximation method (solve Fredholm integral equation of the second kind)
+Vector SuccessiveApproximationMethodFredholm(
+        MaxDouble startIntegral
+        , MaxDouble endIntegral
+        , SpecFunc2Arg kernelFunc
+        , SpecFunc rightFunc
+        , CubatureRules::TCubatureRule cubatureRule
+        );
 }
 
 #endif // LAB2_H
+

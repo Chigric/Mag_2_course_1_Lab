@@ -15,10 +15,26 @@ using namespace std::placeholders;
 
 namespace SundayWork {
 // Fredholm integral equation
-namespace FIE {
-
+namespace FIE_VAR17 {
+using MyTypeAccuracy = long double;
 // Output file
 const string filenameLab2 = "output2.out";
+// Equation
+/// u(x) - /int_0^1(x*t^2*u(t)dt) = 1
+/// u(x) - /int_startT^endT(kernelFunc(x,t)*u(t)) = rightFunc(x) <=>
+/// <=> u(x) = answerFunc(x)
+double startT = 0;
+double endT = 1;
+auto kernelFunc = [](MyTypeAccuracy x, MyTypeAccuracy t) -> MyTypeAccuracy {
+    return x * (t*t);
+};
+auto rightFunc = [](MyTypeAccuracy x) -> MyTypeAccuracy {
+    return 1;
+};
+// answer func (for checking answers)
+auto answerFunc = [](MyTypeAccuracy x) -> MyTypeAccuracy {
+    return 1 + (4/9)*x;
+};
 }
 }
 
@@ -31,24 +47,7 @@ int main_lab2()
     assert(fileLab2.is_open() && "fileLab2 isn't open");
 
 
-    valarray<valarray<long double> > vecA {
-        {1, 2},
-        {3, 4}
-    };
-    valarray<long double> vecY {3, 5};
 
-    /*
-    valarray<valarray<long double> > vecA {
-        {0, 0, double(1)/4},
-        {0, double(2)/8, double(-1)/4},
-        {double(-5)/4, 1, 3}
-    };
-    valarray<long double> vecY {double(-1)/2, 2, 4};
-    */
-    valarray<long double> vecX = SundayWork::gaussianElimination(vecA, vecY);
-    for (auto ptr : vecX)
-        cout << ptr << " ";
-    cout << endl;
 
     return 0;
 }
