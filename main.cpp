@@ -6,7 +6,7 @@
 int main(int argc, char** argv)
 {
     try {
-        main_lab1();
+        //main_lab1();
         main_lab2();
     }
     catch(...) {
