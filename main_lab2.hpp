@@ -43,11 +43,20 @@ int main_lab2()
 {
     cout << endl << setw(12) << "START LAB #2" << endl << endl;
 
-    fstream fileLab2(SundayWork::FIE::filenameLab2, fstream::out | fstream::trunc);
+    fstream fileLab2(SundayWork::FIE_VAR17::filenameLab2, fstream::out | fstream::trunc);
     assert(fileLab2.is_open() && "fileLab2 isn't open");
 
-
-
+    // solve Fredholm integral equation by Trapezoidal rule
+    SundayWork::Vector vecX = SundayWork::SuccessiveApproximationMethodFredholm(
+                SundayWork::FIE_VAR17::startT
+                , SundayWork::FIE_VAR17::endT
+                , SundayWork::FIE_VAR17::kernelFunc
+                , SundayWork::FIE_VAR17::rightFunc
+                , SundayWork::ECubatureRules::Trapezoidal
+                , 6);
+    for (auto ptr : vecX)
+        cout << ptr << " ";
+    cout << endl;
 
     return 0;
 }

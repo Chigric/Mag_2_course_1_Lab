@@ -1,4 +1,5 @@
 #include <cassert>
+#include <map>
 
 #include "lab2.h"
 #include "Output.hpp"
@@ -8,9 +9,7 @@ using namespace std;
 namespace SundayWork {
 
 // Gauss method for square Matrix (or Gaussian elimination)
-//template <typename Vector, typename doubleVector>
 Vector gaussianElimination(const DoubleVector& cVecA, const Vector& cVecY)
-//std::valarray<long double>&& gaussianElimination(const std::valarray<std::valarray<long double> >& cVecA, const std::valarray<long double>& cVecY)
 {
     // Matrix isn't square
     assert(cVecA.size() == cVecY.size() && "Matrix isn't square");
@@ -19,12 +18,12 @@ Vector gaussianElimination(const DoubleVector& cVecA, const Vector& cVecY)
 
     DoubleVector vecA = cVecA;
     Vector vecY = cVecY;
-    for (size_t i = 0; i < vecA.size(); i++) {
+    for (std::size_t i = 0; i < vecA.size(); i++) {
         // swap rows
         if (vecA[i][i] == 0) {
             if (i == vecA.size()-1)
                 continue;
-            for (size_t otherI = i+1; otherI < vecA.size(); otherI++) {
+            for (std::size_t otherI = i+1; otherI < vecA.size(); otherI++) {
                 if (vecA[otherI][i] != 0) {
                     swap(vecA[i], vecA[otherI]);
                     swap(vecY[i], vecY[otherI]);
@@ -40,11 +39,11 @@ Vector gaussianElimination(const DoubleVector& cVecA, const Vector& cVecY)
             vecY[i] /= alignmentBase;
         }
         // reset other all elements in column to 0
-        for (size_t otherI = 0; otherI < vecA.size(); otherI++) {
+        for (std::size_t otherI = 0; otherI < vecA.size(); otherI++) {
             if (otherI == i)
                 continue;
             const long double base = vecA[otherI][i];
-            for (size_t j = 0; j < vecA[otherI].size(); j++) {
+            for (std::size_t j = 0; j < vecA[otherI].size(); j++) {
                 vecA[otherI][j] -= vecA[i][j] * base;
             }
             vecY[otherI] -= vecY[i] * base;
@@ -58,12 +57,85 @@ Vector gaussianElimination(const DoubleVector& cVecA, const Vector& cVecY)
 namespace CubatureRules {
     MaxDouble Trapezoidal(MaxDouble a, MaxDouble b, SpecFunc func)
     {
-        return (func(a) + func(b)) / 2;
+        return ((b - a) / 2 ) * (func(a) + func(b));
     }
 
-    MaxDouble Simpson(MaxDouble a, MaxDouble b, SpecFunc func);
-    MaxDouble Simpson_3by8(MaxDouble a, MaxDouble b, SpecFunc func); // Simpson's 3/8
+    MaxDouble Simpson(MaxDouble a, MaxDouble b, SpecFunc func)
+    {
+        return ((b - a) / 3) * (func(a) + 4*func((a+b)/2) + func(b));
+    }
+
+    MaxDouble Simpson_3by8(MaxDouble a, MaxDouble b, SpecFunc func) // Simpson's 3/8
+    {
+        return ((b-a) * 3/8)
+                * (func(a) + 3*func((b-a) * 1/3) + 3*func((b-a) * 2/3) + func(b));
+    }
 }
 
 
+std::map<ECubatureRules, int> ruleNumberPoints = {
+    {ECubatureRules::Trapezoidal, 2}
+    , {ECubatureRules::Simpson, 3}
+    , {ECubatureRules::Simpson_3by8, 4}
+};
+
+// Successive approximation method (solve Fredholm integral equation of the second kind)
+Vector SuccessiveApproximationMethodFredholm(
+        MaxDouble startIntegral
+        , MaxDouble endIntegral
+        , SpecFunc2Arg kernelFunc
+        , SpecFunc rightFunc
+        , ECubatureRules cubatureRule
+        , std::size_t amountPoints
+        )
+{
+    // Declaration matrixs (fixed)
+    Vector vecX(amountPoints);
+    // Declaration matrixs (mutable)
+    std::size_t numberPoints = ruleNumberPoints[cubatureRule];
+    Vector vecY(numberPoints);
+    DoubleVector vecA(numberPoints);
+    for (auto& ptr : vecA)
+        ptr.resize(numberPoints);
+    // some defines
+    MaxDouble step = (endIntegral-startIntegral)/(amountPoints-1);
+    auto pointI = [&startIntegral, &step](size_t i) -> MaxDouble {
+        return startIntegral+step*i;
+    };
+
+    // init matrixs
+    for (std::size_t k = 0; k < amountPoints; k+=2) {
+        for (std::size_t i = k, j = k; i < k+2; i++) {
+            switch (cubatureRule) {
+            case ECubatureRules::Trapezoidal:
+                vecA[i-k][0] = step * 0.5L * (-1) * kernelFunc(pointI(i), pointI(j));
+                vecA[i-k][1] = step * 0.5L * (-1) * kernelFunc(pointI(i), pointI(j+1));
+                break;
+            case ECubatureRules::Simpson:
+                vecA[i-k][0] = step * MaxDouble(1)/6 * (-1) * kernelFunc(pointI(i), pointI(j));
+                vecA[i-k][1] = step * MaxDouble(4)/6 * (-1) *
+                        kernelFunc(pointI(i), (pointI(j+1)-pointI(j))/2);
+                vecA[i-k][2] = step * MaxDouble(1)/6 * (-1) * kernelFunc(pointI(i), pointI(j+1));
+                break;
+            case ECubatureRules::Simpson_3by8:
+                vecA[i-k][0] = step * MaxDouble(3)/8 * (-1) * kernelFunc(pointI(i), pointI(j));
+                vecA[i-k][1] = step * MaxDouble(3)/8 * (-1) *
+                        3 * kernelFunc(pointI(i), (pointI(j+1)-pointI(j))/3);
+                vecA[i-k][2] = step * MaxDouble(3)/8 * (-1) *
+                        3 * kernelFunc(pointI(i), ((pointI(j+1)-pointI(j))*2)/3);
+                vecA[i-k][3] = step * MaxDouble(3)/8 * (-1) * kernelFunc(pointI(i), pointI(j+1));
+                break;
+            default:
+                assert(false && "I cann't to work with this method");
+                break;
+            }
+            vecY[i-k] = rightFunc(pointI(i));
+            vecA[i-k][i-k] += 1;
+        }
+        Vector tmpVecX = gaussianElimination(vecA, vecY);
+        for (std::size_t j = 0; j < 2; j++)
+            vecX[k+j] = tmpVecX[j];
+    }
+    return vecX;
+}
 }

@@ -27,13 +27,20 @@ namespace CubatureRules {
     MaxDouble Simpson_3by8(MaxDouble a, MaxDouble b, SpecFunc func); // Simpson's 3/8
 }
 
+enum class ECubatureRules : short int
+{
+    Trapezoidal
+    , Simpson
+    , Simpson_3by8
+};
+
 // Successive approximation method (solve Fredholm integral equation of the second kind)
-Vector SuccessiveApproximationMethodFredholm(
-        MaxDouble startIntegral
+Vector SuccessiveApproximationMethodFredholm(MaxDouble startIntegral
         , MaxDouble endIntegral
         , SpecFunc2Arg kernelFunc
         , SpecFunc rightFunc
-        , CubatureRules::TCubatureRule cubatureRule
+        , ECubatureRules cubatureRule
+        , std::size_t amountPoints
         );
 }
 
