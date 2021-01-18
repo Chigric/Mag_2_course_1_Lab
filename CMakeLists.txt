@@ -5,11 +5,12 @@ project(Mag_2_course_1_Lab)
 #set(SOURCES ooo.cpp)
 #add_library(Output INTERFACE)
 #target_sources(Output INTERFACE Output.hpp)
-set(SPEC_HEADER "main_lab1.hpp" "main_lab2.hpp")
+set(SPEC_HEADER "main_lab1.hpp" "main_lab2.hpp" "main_lab3.hpp")
 add_executable(${PROJECT_NAME}
 	"main.cpp"
 	"lab1.cpp" "lab1.h"
 	"lab2.cpp" "lab2.h"
+	"lab3.cpp" "lab3.h"
 	"Output.hpp"
 	${SPEC_HEADER})
 

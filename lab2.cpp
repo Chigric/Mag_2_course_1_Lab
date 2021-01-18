@@ -4,8 +4,6 @@
 #include "lab2.h"
 #include "Output.hpp"
 
-using namespace std;
-
 namespace SundayWork {
 
 // Gauss method for square Matrix (or Gaussian elimination)
@@ -25,8 +23,8 @@ Vector gaussianElimination(const DoubleVector& cVecA, const Vector& cVecY)
                 continue;
             for (std::size_t otherI = i+1; otherI < vecA.size(); otherI++) {
                 if (vecA[otherI][i] != 0) {
-                    swap(vecA[i], vecA[otherI]);
-                    swap(vecY[i], vecY[otherI]);
+                    std::swap(vecA[i], vecA[otherI]);
+                    std::swap(vecY[i], vecY[otherI]);
                     break;
                 }
             }
@@ -105,7 +103,7 @@ Vector SuccessiveApproximationMethodFredholm(
 
     // init matrixs
     for (std::size_t k = 0; k < amountPoints; k+=2) {
-        for (std::size_t i = k, j = k; i < k+2; i++) {
+        for (std::size_t i = k, j = k; i < k+numberPoints; i++) {
             switch (cubatureRule) {
             case ECubatureRules::Trapezoidal:
                 vecA[i-k][0] = step * 0.5L * (-1) * kernelFunc(pointI(i), pointI(j));
@@ -133,8 +131,9 @@ Vector SuccessiveApproximationMethodFredholm(
             vecA[i-k][i-k] += 1;
         }
         Vector tmpVecX = gaussianElimination(vecA, vecY);
-        for (std::size_t j = 0; j < 2; j++)
-            vecX[k+j] = tmpVecX[j];
+        // moving "extreme" points
+        vecX[k+0] = tmpVecX[0];
+        vecX[k+1] = tmpVecX[numberPoints-1];
     }
     return vecX;
 }
