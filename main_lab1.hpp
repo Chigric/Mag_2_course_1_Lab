@@ -52,6 +52,7 @@ void solveEulerMethod(const string& annotation, fstream& fileLab1,
                 << endl << endl;
 }
 
+
 int main_lab1()
 {
     cout << endl;

@@ -28,16 +28,16 @@ const string filenameLab3ForExcel = "output3ForExcel.out";
 /// u(x) - /int_startT^endT(kernelFunc(x,t)*u(t)) = rightFunc(x) <=>
 /// <=> u(x) = answerFunc(x)
 double startT = 0;
-double endT = 1;
+double endT = M_PIl/3;
 auto kernelFunc = [](MyTypeAccuracy x, MyTypeAccuracy t) -> MyTypeAccuracy {
-    return std::exp(-(x - t));
+    return 2*std::exp(x - t);
 };
 auto rightFunc = [](MyTypeAccuracy x) -> MyTypeAccuracy {
-    return std::exp(-x);
+    return std::sin(x);
 };
 // answer func (for checking answers)
 auto answerFunc = [](MyTypeAccuracy x) -> MyTypeAccuracy {
-    return 1;
+    return 0.2L*std::exp(3*x) - 0.2L*std::cos(x) + 0.4L*std::sin(x);
 };
 }
 }
@@ -51,9 +51,8 @@ void solvingAccuracy3(SundayWork::Vector&& numVec, SundayWork::MaxDouble qualSte
     Vector answerVec(qualStep);
     Vector accuracyVec(qualStep);
 
-    int i = 0;
-    for (MaxDouble x = startT; x <= endT; x += stepX, i++) {
-        answerVec[i] = answerFunc(x);
+    for (int i = 0; i < qualStep; i++) {
+        answerVec[i] = answerFunc(startT + (stepX*i));
         accuracyVec[i] = std::abs(answerVec[i] - numVec[i]);
     }
     // print vectors to consol && file
@@ -64,7 +63,7 @@ void solvingAccuracy3(SundayWork::Vector&& numVec, SundayWork::MaxDouble qualSte
     SundayWork::output2FileOneVec(file, accuracyVec, 5, "R_i");
 
     file.open(filenameLab3, fstream::in | fstream::app);
-    assert(file.is_open() && "fileLab2 isn't open");
+    assert(file.is_open() && "fileLab3 isn't open");
     cout        << "|---------------- END MATH METHOD ----------------|"
                 << std::endl << std::endl
                 << "Max accuracy " << accuracyVec.max()
@@ -73,24 +72,42 @@ void solvingAccuracy3(SundayWork::Vector&& numVec, SundayWork::MaxDouble qualSte
                 << std::endl << std::endl
                 << "Max accuracy " << accuracyVec.max()
                 << std::endl << std::endl;
-
-    // for excel table
-    fstream file33333(filenameLab3ForExcel, fstream::in | fstream::app);
-    SundayWork::output2ExcelTable(file33333, numVec, 5, "X_i");
 }
 
-void printDefaultFuncForExcelTable3(SundayWork::MaxDouble qualStep)
+void printDefaultFuncForExcelTable3(SundayWork::MaxDouble qualStep
+                                    , SundayWork::Vector& trap
+                                    , SundayWork::Vector& simpson
+                                    , SundayWork::Vector& simpson_3by8)
 {
     using namespace SundayWork::VIE_VAR3;
-    SundayWork::MaxDouble stepX = (endT - startT) / qualStep;
-    SundayWork::Vector answerVec(qualStep+1);
+    SundayWork::MaxDouble stepX = (endT - startT) / (qualStep-1);
+    SundayWork::Vector answerVec(qualStep);
 
-    int i = 0;
-    for (auto x = startT; x < endT; x += stepX, i++)
-        answerVec[i] = answerFunc(x);
+    // generation answer array
+    for (int i = 0; i < qualStep; i++)
+        answerVec[i] = answerFunc(startT + (stepX*i));
+    // opening file
+    fstream fileExcel(filenameLab3ForExcel, fstream::in | fstream::app);
+    //SundayWork::output2ExcelTable(fileExcel, answerVec, 5, "answer");
+    SundayWork::DoubleOutput out(fileExcel, 5);
 
-    fstream file33333(filenameLab3ForExcel, fstream::in | fstream::app);
-    SundayWork::output2ExcelTable(file33333, answerVec, 5, "answer");
+    // out array to excel table
+    out << "i" << "\tx"
+        << "\tАналитическое решение"
+        << "\tМетод трапеций"
+        << "\tМетод Симпсона"
+        << "\tМетод трех восьмых"
+        << SundayWork::endl;
+    for (int i = 0; i < qualStep; i++) {
+        out << i
+            << "\t" << (startT + stepX*i)
+            << "\t" << answerVec[i]
+            << "\t" << trap[i]
+            << "\t" << simpson[i]
+            << "\t" << simpson_3by8[i];
+        out << SundayWork::endl;
+    }
+    out << SundayWork::endl;
 }
 
 template <typename Func>
@@ -99,15 +116,15 @@ void solveApproximationMethod3(Func func, std::fstream& file)
     long double steps[] = {10, 100};
 
     for (auto step : steps) {
-        // solve Fredholm integral equation by Trapezoidal rule
+        // solve Volterra integral equation by Trapezoidal rule
         SundayWork::Vector vecXTrapezoidal = func(SundayWork::ECubatureRules::Trapezoidal, step);
-        // solve Fredholm integral equation by Simpson rule
+        // solve Volterra integral equation by Simpson rule
         SundayWork::Vector vecXSimpson = func(SundayWork::ECubatureRules::Simpson, step);
-        // solve Fredholm integral equation by Simpson 3 by 8 rule
+        // solve Volterra integral equation by Simpson 3 by 8 rule
         SundayWork::Vector vecXSimpson_3by8 = func(SundayWork::ECubatureRules::Simpson_3by8, step);
 
         // For excel table
-        printDefaultFuncForExcelTable3(step);
+        printDefaultFuncForExcelTable3(step, vecXTrapezoidal, vecXSimpson, vecXSimpson_3by8);
 
         solvingAccuracy3(std::move(vecXTrapezoidal), step, file);
         solvingAccuracy3(std::move(vecXSimpson), step, file);
@@ -116,6 +133,7 @@ void solveApproximationMethod3(Func func, std::fstream& file)
     }
 }
 
+
 int main_lab3()
 {
     cout << endl << setw(12) << "START LAB #3" << endl << endl;
@@ -123,7 +141,10 @@ int main_lab3()
     fstream fileLab3(SundayWork::VIE_VAR3::filenameLab3, fstream::out | fstream::trunc);
     assert(fileLab3.is_open() && "fileLab3 isn't open");
 
-    // template func for successive solving Fredholm integral equation of the second kind (by approximation method)
+    fstream filenameLab3ForExcel(SundayWork::VIE_VAR3::filenameLab3ForExcel, fstream::out | fstream::trunc);
+    assert(filenameLab3ForExcel.is_open() && "filenameLab3ForExcel isn't open");
+
+    // template func for successive solving Volterra integral equation of the second kind (by approximation method)
     auto approximationMethod = std::bind(SundayWork::successiveApproximationMethodVolterra,
                               SundayWork::VIE_VAR3::startT
                               , SundayWork::VIE_VAR3::endT

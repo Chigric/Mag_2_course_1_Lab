@@ -20,18 +20,30 @@ Vector coefsForVolterraIntegralEquation(ECubatureRules cubatureRule, std::size_t
         }
         break;
     case ECubatureRules::Simpson:
-        for (std::size_t i = 0; i < amountPoints-2; i++) {
-            coefs[i+0] += 1.L/6;
-            coefs[i+1] += 4.L/6;
-            coefs[i+2] += 1.L/6;
+        coefs[0] = (1.L/3);
+        coefs[amountPoints-1] = (1.L/3);
+        for (size_t m = 1; m <= amountPoints/2 - 1; m++) {
+            if (m*2 < amountPoints)
+                coefs[m*2] = (4.L/8);
+        }
+        for (size_t m = 1; m <= amountPoints/2; m++) {
+            if (m*2 < amountPoints) {
+                coefs[m*2 - 1] = (6.L/4);
+            }
         }
         break;
     case ECubatureRules::Simpson_3by8:
-        for (std::size_t i = 0; i < amountPoints-3; i++) {
-            coefs[i+0] += 3.L/8;
-            coefs[i+1] += 9.L/8;
-            coefs[i+2] += 9.L/8;
-            coefs[i+3] += 3.L/8;
+        coefs[0] = (3.L/8);
+        coefs[amountPoints-1] = (3.L/8);
+        for (size_t m = 1; m <= amountPoints/3 - 1; m++) {
+            if (m*3 < amountPoints)
+                coefs[m*3] = (6.L/8);
+        }
+        for (size_t m = 1; m <= amountPoints/3; m++) {
+            if (m*3 < amountPoints) {
+                coefs[m*3 - 2] = (9.L/8);
+                coefs[m*3 - 1] = (9.L/8);
+            }
         }
         break;
     default:

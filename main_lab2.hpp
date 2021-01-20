@@ -125,6 +125,7 @@ void solveApproximationMethod(Func func, std::fstream& file)
     }
 }
 
+
 int main_lab2()
 {
     cout << endl << setw(12) << "START LAB #2" << endl << endl;

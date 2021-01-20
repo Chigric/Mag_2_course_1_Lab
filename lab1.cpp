@@ -5,7 +5,7 @@ using namespace std;
 
 namespace SundayWork {
 
-namespace  {
+namespace {
 // init array for X_n
 template<typename TArray, typename Type>
 void initArrX(TArray& arrX, const Type startX, const Type step)
