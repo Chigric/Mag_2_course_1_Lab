@@ -1,0 +1,6 @@
+project(common)
+set(SPEC_HEADER "Output.hpp")
+set(SOURCES )
+set(HEADERS )
+add_library(common ${SPEC_HEADER} ${SOURCES} ${HEADERS})
+target_include_directories(common PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

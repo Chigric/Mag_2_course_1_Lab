@@ -1,7 +1,7 @@
 #ifndef LAB3_H
 #define LAB3_H
 
-#include "lab2.h"
+#include "cubatureRules.h"
 
 namespace SundayWork {
 

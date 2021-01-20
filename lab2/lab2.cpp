@@ -51,32 +51,6 @@ Vector gaussianElimination(const DoubleVector& cVecA, const Vector& cVecY)
     return vecY;
 }
 
-
-namespace CubatureRules {
-    MaxDouble Trapezoidal(MaxDouble a, MaxDouble b, SpecFunc func)
-    {
-        return ((b - a) / 2 ) * (func(a) + func(b));
-    }
-
-    MaxDouble Simpson(MaxDouble a, MaxDouble b, SpecFunc func)
-    {
-        return ((b - a) / 3) * (func(a) + 4*func((a+b)/2) + func(b));
-    }
-
-    MaxDouble Simpson_3by8(MaxDouble a, MaxDouble b, SpecFunc func) // Simpson's 3/8
-    {
-        return ((b-a) * 3/8)
-                * (func(a) + 3*func((b-a) * 1/3) + 3*func((b-a) * 2/3) + func(b));
-    }
-}
-
-
-std::map<ECubatureRules, int> ruleNumberPoints = {
-    {ECubatureRules::Trapezoidal, 2}
-    , {ECubatureRules::Simpson, 3}
-    , {ECubatureRules::Simpson_3by8, 4}
-};
-
 // Successive approximation method (solve Fredholm integral equation of the second kind)
 Vector SuccessiveApproximationMethodFredholm(
         MaxDouble startIntegral
